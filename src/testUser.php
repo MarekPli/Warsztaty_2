@@ -1,9 +1,8 @@
 <?php
-include_once (__DIR__ . '/scr/User.php');
-include_once (__DIR__ . '/scr/DB_open.php');
-include_once (__DIR__ . '/scr/form_asking.html');
-require_once('vendor/autoload.php');
-require_once('vendor/autoload.php');
+include_once(__DIR__ . '/User.php');
+include_once(__DIR__ . '/DB_open.php');
+include_once(__DIR__ . '/form_test.html');
+require_once(__DIR__ . '/../vendor/autoload.php');
 
 $faker = \Faker\Factory::create('pl');
 
@@ -60,8 +59,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user1 = createRandomUser($pdo);
 //            $user = clone $user1;
             // better than below, there is no simple setPassword:
-        $user->setUsername($user1->getUsername());
-        $user->setEmail($user1->getEmail());
+            // but cloning destroys id and setter for id is forbiden by conditions
+            $user->setUsername($user1->getUsername());
+            $user->setEmail($user1->getEmail());
             $user1 = null;
             $user->saveToDB($pdo);
 
@@ -86,6 +86,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($result === false) {
             echo "Nie udało się usunąć wskazanego elementu.<br>";
         }
+    } elseif (isset($_POST['is_email'])) {
+        $result = User::is_email($pdo, $_POST['is_email']);
+        // echo $_POST['is_email'] . ' występuje ' . $result . ' razy<br>';
+        if ($result) {
+            echo $_POST['is_email']
+                . ' występuje w bazie jako adres mailowy.<br>';
+        } else {
+            echo 'Nie znaleziono adresu mailowego '
+                . $_POST['is_email'] . '<br>';
+        }
+
+    } elseif (isset($_POST['is_username'])) {
+        $result = User::is_username($pdo, $_POST['is_username']);
+        // echo $_POST['is_email'] . ' występuje ' . $result . ' razy<br>';
+        if ($result) {
+            echo "Użytkownik " . $_POST['is_username']
+                . ' występuje w bazie.<br>';
+        } else {
+            echo 'Nie znaleziono użytkownika: '
+                . $_POST['is_username'] . '<br>';
+        }
+
     } else {
         echo 'Błąd w programie<br>';
     }

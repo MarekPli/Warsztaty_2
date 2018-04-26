@@ -49,6 +49,23 @@ class User
         return $this->hashPass;
     }
 
+    public function delete (PDO $conn) {
+        $id = $this->getId();
+        echo "Indeks: $id";
+        if ($id != -1) {
+            $stmt = $conn->prepare("DELETE FROM Users"
+                . " WHERE id=:id");
+            $result = $stmt->execute([':id' => $id]);
+            if ($result === true) {
+                echo "Indeks: $id";
+                $this->id = -1;
+                echo "udało się<br>";
+            }
+            return $result;
+        }
+        return false;
+    }
+
     public function saveToDB(PDO $conn) {
         if ($this->id == -1) { // sprawdzanie czy obiektu nie ma już w bazie
             $stmt = $conn->prepare(
@@ -92,6 +109,7 @@ class User
         }
         return false;
     }
+
     static public function loadAll (PDO $conn)
     {
         $stmt = $conn->prepare('SELECT * FROM Users');
@@ -114,20 +132,25 @@ class User
         }
         return $arr;
     }
-    public function delete (PDO $conn) {
-        $id = $this->getId();
-        echo "Indeks: $id";
-        if ($id != -1) {
-            $stmt = $conn->prepare("DELETE FROM Users"
-             . " WHERE id=:id");
-            $result = $stmt->execute([':id' => $id]);
-            if ($result === true) {
-                echo "Indeks: $id";
-                $this->id = -1;
-                echo "udało się<br>";
+
+    static public function is_email (PDO $conn, $email) {
+            $stmt = $conn->prepare("SELECT email FROM Users"
+             . " WHERE email=:email");
+            $stmt->execute([':email' => $email]);
+            $result = $stmt->rowCount();
+            if ($result > 0) {
+                return true;
             }
-            return $result;
-        }
-        return false;
+            return false;
+    }
+    static public function is_username (PDO $conn, $username) {
+            $stmt = $conn->prepare("SELECT username FROM Users"
+             . " WHERE username=:username");
+            $stmt->execute([':username' => $username]);
+            $result = $stmt->rowCount();
+            if ($result > 0) {
+                return true;
+            }
+            return false;
     }
 }
