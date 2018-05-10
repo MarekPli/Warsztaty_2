@@ -1,12 +1,12 @@
 <?php
 include_once(__DIR__ . '/User.php');
 include_once(__DIR__ . '/DB_open.php');
-include_once(__DIR__ . '/form_test.html');
+include_once(__DIR__ . '/form_test.php');
 require_once(__DIR__ . '/../vendor/autoload.php');
 
 $faker = \Faker\Factory::create('pl');
 
-function createRandomUser (PDO $base) {
+function createRandomUser () {
     global $faker;
 
     $newUser = new User();
@@ -26,10 +26,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // addRandomUser($pdo);
     if (isset($_POST['add_user'])) {
         echo 'Wybrano dodanie użytkownika<br>';
-        $user = createRandomUser($pdo);
-        $user->saveToDB($pdo);
-        echo $user->getId() . ' ' .
-            $user->getUsername() . '<br>';
+        $user = createRandomUser();
+        $i = $user->saveToDB($pdo);
+        echo "[ " . $i . ' ] ' .
+            $user->getUsername() . ' ' .
+            $user->getEmail() .'<br>';
     } elseif (isset($_POST['nr_index'])) {
         echo 'Wybrano wczytanie użytkownika nr ' . $_POST['nr_index'] . "<br>";
         $user = User::loadUserById($pdo, $_POST['nr_index']);
@@ -39,15 +40,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             echo 'Takiego użytkownika nie ma<br>';
         }
-    } elseif (isset($_POST['add_all'])) {
+    } elseif (isset($_POST['add_all']) || isset($_POST['admin']) ) {
         echo 'Wybrano wczytanie wszystkich użytkowników' . "<br>";
         $arrUsers = User::loadAll($pdo);
         if (empty($arrUsers)) {
             echo 'Nie udało się wczytać żadnych użytkowników<br>';
         } else {
             foreach ($arrUsers as $user) {
-                echo $user->getId() . ' ' .
-                    $user->getUsername() . '<br>';
+                $s = $_POST['admin'];
+                if (isset($_POST['admin'])) {
+                    $s = ' < ' . $user->betrayPassword($s) . ' > ';
+                    echo $user->getId() . ' ' .
+                        $user->getUsername() . $s .
+                        '<br>';
+                }
+                else {
+                    echo "[ " . $user->getId() . ' ] ' .
+                        $user->getUsername() . "\t\t---\t" .
+                        $user->getEmail() .
+                        '<br>';
+                }
             }
         }
     } elseif (isset($_POST['modify_index'])) {
@@ -76,7 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = User::loadUserById($pdo, $_POST['delete_index']);
         $result = false;
         if ($user !== false) {
-            echo 'Identyfikator w obiekcie: ' . $user->getId() . '<br>';
             echo 'Pożegnamy się z: ' . $user->getUsername() . '<br>';
             $result = $user->delete($pdo);
             if ($result === true) {
@@ -92,6 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($result) {
             echo $_POST['is_email']
                 . ' występuje w bazie jako adres mailowy.<br>';
+            echo "I co: " . $result->getEmail();
         } else {
             echo 'Nie znaleziono adresu mailowego '
                 . $_POST['is_email'] . '<br>';
@@ -113,8 +125,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
 }
-
-
 
 ?>
 

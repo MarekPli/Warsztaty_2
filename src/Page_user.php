@@ -1,15 +1,26 @@
+<?php
+session_start();
+$_SESSION['user'] = $_POST['user'];
+//print_r($_SESSION);
+?>
 <!DOCTYPE html>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
 <table>
     <td>
-        <p id="username"></p>
-    </td><td> </td><td>
-        <p id="datename"></p>
+    <p>Użytkownik:<br>
+        <?php echo $_SESSION['username']?></p>
+    </td><td></td><td>
+        <p id="datename">
+        </p>
     </td>
     <td>
         <form action="test1.php" method="post" >
             <input type="submit" name ="logout" value="Wyloguj się">
         </form>
-            </td>
+        <form action="Page_main.php" method="post" >
+            <input type="submit" name ="comeback" value="Strona główna">
+        </form>
+    </td>
 </table>
 <form action="Page_user.php" method="post" >
     <label>Do strony wyświetlania użytkownika:
@@ -18,8 +29,8 @@
     </label>
 </form>
 <form action="Page_tweet.php" method="post" >
-    <label>Do strony wyświetlania wpisu (tweeta) nr:
-        <input type="text" id="user" size="16" name ="tweet">
+    <label>Do strony wyświetlania wpisu (tweeta):
+        <input type="text" id="user" name ="user">
         <input type="submit">
     </label>
 </form>
@@ -36,21 +47,16 @@
     </label>
 </form>
 
-<h1>Strona główna</h1>
-
-<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
-<form action="test1.php" method="post">
-    <label>Stwórz nowy wpis:
-        <input type="text" id="tweet" name ="new_tweet">
-    </label>
-    <br>
-    </label>
-    <input type="submit" id="exit" value ="Dodaj wpis">
-</form>
+<h1>Strona wyświetlania użytkownika: <?php echo $_SESSION['user']?> </h1>
+<p id="user_tweets"></p>
 <p id="prompt"></p>
-<script>
+<form action="">
+    <input type="text" size="40">
+<input type="submit" value="Wyślij wiadomość do <?php echo $_SESSION['user']?>">
+</form>
 
-function ajaxianCollectTweets() {
+<script>
+function ajaxianUserTweets(prompt) {
     var result;
     $.ajax({
         type: "POST",
@@ -58,33 +64,16 @@ function ajaxianCollectTweets() {
         dataType: "json",
         async: false, // ----------- !!!
         data: {
-            option: "tweets"
+            option: "user_tweets"
         }
     }).done(function (response) {
         result = response;
-        // $("#prompt").html(response);
-        // nie: tym razem przeniesione do programu głównego
-    }) ;
-    return result;
-}
-
-function ajaxianGetSesssionUsername(prompt) {
-    var result;
-    $.ajax({
-        type: "POST",
-        url: "test1.php",
-        dataType: "html",
-        async: false, // ----------- !!!
-        data: {
-            option: "username"
-        }
-    }).done(function (response) {
-        result = response;
-        $("#username").html(prompt + response);
+        $("#user_tweets").html(prompt + response);
         // alert(response); // no pewnie że ciągle sprawdzałem!
     }) ;
     return result;
 }
+
 function ajaxianGetDatename(prompt) {
     var result;
     $.ajax({
@@ -102,20 +91,13 @@ function ajaxianGetDatename(prompt) {
     return result;
 }
 
+
 $(function() {
-    ajaxianGetSesssionUsername("Użytkownik: <br>");
+    // ajaxianGetSesssionUsername("Użytkownik: <br>");
     ajaxianGetDatename("Dzisiejszy dzień to: <br>");
-    var p = document.getElementById('#user');
-    var arrTweets = ajaxianCollectTweets();
-    $("#prompt").html(arrTweets);
-
-    // for (var i=0; i<arrTweets.length; i++) {
-    //     var newTweet = document.createElement('div');
-    //     // newTweet.appendChild();
-    //     alert("ddd " +arrTweets);
-    // }
+    // var p = document.getElementById('#user');
+    var arrTweets = ajaxianUserTweets('Tweety użytkownika<br><br>');
 });
-
 
 </script>
 </html>
