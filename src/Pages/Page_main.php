@@ -1,16 +1,13 @@
+<?php
+session_start();
+//print_r($_SESSION);
+?>
 <!DOCTYPE html>
-<table>
-    <td>
-        <p id="username"></p>
-    </td><td> </td><td>
-        <p id="datename"></p>
-    </td>
-    <td>
-        <form action="test1.php" method="post" >
-            <input type="submit" name ="logout" value="Wyloguj się">
-        </form>
-            </td>
-</table>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+
+<?php require_once(__DIR__ . '/../header_js.php') ?>
+
+
 <form action="Page_user.php" method="post" >
     <label>Do strony wyświetlania użytkownika:
         <input type="text" id="user" name ="user">
@@ -24,24 +21,26 @@
     </label>
 </form>
 <form action="Page_user_edit.php" method="post" >
-    <label>Do strony edycji użytkownika:
-        <input type="text" id="user" name ="user">
-        <input type="submit">
-    </label>
+<!--    <label>Do strony edycji użytkownika:-->
+<!--        <input type="text" id="user" name ="user">-->
+        <input type="submit" name ="user" value="Do strony edycji użytkownika">
+<!--        <input type="submit">-->
+<!--    </label>-->
 </form>
-<form action="Page_user_msg.php" method="post" >
-    <label>Do strony wiadomości:
-        <input type="text" id="user" name ="user">
-        <input type="submit">
-    </label>
+<form action="Page_msg.php" method="post" >
+<!--    <label>Do strony wiadomości:-->
+<!--        <input type="text" id="user" name ="user">-->
+        <input type="submit" name ="user" value="Do strony wiadomości">
+<!--        <input type="submit">-->
+<!--    </label>-->
 </form>
 
 <h1>Strona główna</h1>
 
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
-<form action="test1.php" method="post">
+<form action="../Json_commands.php" method="post">
     <label>Stwórz nowy wpis:
-        <input type="text" id="tweet" name ="new_tweet">
+        <input type="text" id="tweet" name ="new_tweet" size="45">
     </label>
     <br>
     </label>
@@ -54,7 +53,7 @@ function ajaxianCollectTweets() {
     var result;
     $.ajax({
         type: "POST",
-        url: "test1.php",
+        url: "../Json_commands.php",
         dataType: "json",
         async: false, // ----------- !!!
         data: {
@@ -68,11 +67,28 @@ function ajaxianCollectTweets() {
     return result;
 }
 
+function ajaxianNewTweet(prompt) {
+    if (prompt != 0) {
+        $.ajax({
+            type: "POST",
+            url: "../Json_commands.php",
+            dataType: "json",
+            async: false, // ----------- !!!
+            data: {
+                option:
+                    "new_tweet"
+            }
+        }).done(function (response) {
+            prompt = 0;
+        });
+    }
+}
+
 function ajaxianGetSesssionUsername(prompt) {
     var result;
     $.ajax({
         type: "POST",
-        url: "test1.php",
+        url: "../Json_commands.php",
         dataType: "html",
         async: false, // ----------- !!!
         data: {
@@ -85,22 +101,6 @@ function ajaxianGetSesssionUsername(prompt) {
     }) ;
     return result;
 }
-function ajaxianGetDatename(prompt) {
-    var result;
-    $.ajax({
-        type: "POST",
-        url: "test1.php",
-        dataType: "html",
-        async: false, // ----------- !!!
-        data: {
-            option: "datename"
-        }
-    }).done(function (response) {
-        result = response;
-        $("#datename").html(prompt + response);
-    }) ;
-    return result;
-}
 
 $(function() {
     ajaxianGetSesssionUsername("Użytkownik: <br>");
@@ -108,6 +108,8 @@ $(function() {
     var p = document.getElementById('#user');
     var arrTweets = ajaxianCollectTweets();
     $("#prompt").html(arrTweets);
+    ajaxianNewTweet(<?php echo $newTweet ?>);
+
 
     // for (var i=0; i<arrTweets.length; i++) {
     //     var newTweet = document.createElement('div');
@@ -119,3 +121,15 @@ $(function() {
 
 </script>
 </html>
+
+<?php
+$newTweet = 0;
+if ( $_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['new_tweet'])
+        && !empty($_POST['new_tweet'])
+    ) {
+        $newTweet = 1;
+    }
+}
+
+?>

@@ -14,10 +14,10 @@
     <input type="submit" value ="Zaloguj się" id="exit">
 </form></td>
         <td>
-<form action=".././indeks.php" method="post" name="page_new_user">
-    <input type="submit" value ="Powrót">
+<form action="../../indeks.php" method="post" name="page_new_user">
+    <input type="submit" value ="Strona startowa">
 </form>
-<form action="Page_create_user.php" method="post" name="page_new_user">
+<form action="Page_user_create.php" method="post" name="page_new_user">
     <input type="submit" value ="Rejestracja">
 </form>
     </td>
@@ -30,7 +30,7 @@ function ajaxianQuery(email, haslo) {
     var result;
     $.ajax({
         type: "POST",
-        url: "test1.php",
+        url: "../json_commands.php",
         dataType: "html", // oczekuje tekstu, wartość logiczna się źle przekazuje
         async: false, // ----------- !!!
         data: {

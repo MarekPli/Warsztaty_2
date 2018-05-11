@@ -1,9 +1,9 @@
 <?php
-include_once(__DIR__ . '/Tweet.php');
-include_once(__DIR__ . '/User.php');
-include_once(__DIR__ . '/DB_open.php');
+include_once(__DIR__ . '/../Classes/Tweet.php');
+include_once(__DIR__ . '/../Classes/User.php');
+include_once(__DIR__ . '/../DB_open.php');
 include_once(__DIR__ . '/form_testTweet.php');
-require_once(__DIR__ . '/../vendor/autoload.php');
+require_once(__DIR__ . '/../../vendor/autoload.php');
 
 define(MAX_TXT, 140);
 

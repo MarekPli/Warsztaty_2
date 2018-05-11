@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <?php
-require_once(__DIR__ . '/table_test.php');
+require_once(__DIR__ . '/../header_test.php');
 ?>
 <h1>Testowanie użytkowników</h1>
 <form action="testUser.php" method="post" name="add">
@@ -14,7 +14,7 @@ require_once(__DIR__ . '/table_test.php');
         <input type="submit" name="get_user">
     </label>
 </form>
-<form  action="testUser.php" method="post" name="get">
+<form action="testUser.php" method="post" name="get">
 <label>Zmodyfikowanie wybranego użytkownika:
         <input type="number" value="1" min="1" name="modify_index">
         <input type="submit" name="">

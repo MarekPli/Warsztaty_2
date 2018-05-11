@@ -23,3 +23,4 @@ function myOpenDatabase ($dbase) {
     $conn->exec('use ' . $dbase);
     return $conn;
 }
+?>

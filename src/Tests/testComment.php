@@ -1,10 +1,10 @@
 <?php
-include_once(__DIR__ . '/Comment.php');
-include_once(__DIR__ . '/Tweet.php');
-include_once(__DIR__ . '/User.php');
+include_once(__DIR__ . '/../Classes/Comment.php');
+include_once(__DIR__ . '/../Classes/Tweet.php');
+include_once(__DIR__ . '/../Classes/User.php');
 include_once(__DIR__ . '/form_testComment.php');
-include_once(__DIR__ . '/DB_open.php');
-require_once(__DIR__ . '/../vendor/autoload.php');
+include_once(__DIR__ . '/../DB_open.php');
+require_once(__DIR__ . '/../../vendor/autoload.php');
 
 define(MAX_TXT, 60);
 

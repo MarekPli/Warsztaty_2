@@ -160,6 +160,20 @@ was_read=:was_read'
             return $arr[0];
         }
     }
+    static public function loadMessagesIfId(PDO $conn, $id)
+    {
+        $stmt = $conn->prepare('SELECT * FROM Messages'
+            .' WHERE sender_id=:id OR receiver_id=:id'
+            .' ORDER BY creation_date DESC');
+        $result = $stmt->execute([':id' => $id]);
+        $arr = [];
+        if ($result === true && $stmt->rowCount() > 0) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $arr[] = self::copyData($row);
+            }
+        }
+        return $arr;
+    }
 
     static private function copyData($row)
     {

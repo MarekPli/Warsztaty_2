@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <?php
-require_once(__DIR__ . '/table_test.php');
+require_once(__DIR__ . '/../header_test.php');
 ?>
 <h1>Testowanie komentarzy</h1>
 <form action="testComment.php" method="post" >

@@ -65,6 +65,12 @@ class User
         }
     }
 
+    public function isTheSamePass($password) {
+        $passHashed = $this->getHashPass();
+        $result = password_verify($password, $passHashed);
+        return $result;
+    }
+
     public function delete (PDO $conn) {
         $id = $this->getId();
 //        echo "Indeks: $id";

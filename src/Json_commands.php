@@ -1,13 +1,18 @@
 <?php
 session_start();
 
-include_once(__DIR__ . '/User.php');
-include_once(__DIR__ . '/Tweet.php');
-include_once(__DIR__ . '/Comment.php');
+include_once(__DIR__ . '/Classes/User.php');
+include_once(__DIR__ . '/Classes/Tweet.php');
+include_once(__DIR__ . '/Classes/Comment.php');
+include_once(__DIR__ . '/Classes/Message.php');
 include_once(__DIR__ . '/DB_open.php');
 
 
 function createNewTweet($pdo, $textTweet){
+    if (empty($textTweet)) {
+//         nie wiem jak inaczej uniknąć dodawania pustych wpisów
+        return;
+    }
     $tt = new Tweet();
     $user = User::is_username($pdo, $_SESSION['username']);
     $tt->setUserId($user->getId());
@@ -40,16 +45,25 @@ function authorTorC($pdo, $obj) {
     return $user->getUsername();
 }
 
+function preparePOSToption($option){
+    if (isset($_POST[$option]) && !empty($_POST[$option])) {
+        $_POST['option'] = $option;
+    }
+}
+
 if ( $_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST["new_tweet"]) && !empty($_POST["new_tweet"])) {
-        $_POST['option'] = 'new_tweet';
+
+    preparePOSToption('new_tweet');
+    preparePOSToption('logout');
+    preparePOSToption('full_tweet');
+    preparePOSToption('messages');
+    preparePOSToption('msg_single');
+
+    if (empty($_POST['option'])) {
+        header('Location: Pages/Page_main.php');
+        // to gdy przekazano puty nowy tweet
     }
-    if (isset($_POST["logout"]) && !empty($_POST["logout"])) {
-        $_POST['option'] = 'logout';
-    }
-    if (isset($_POST["full_tweet"]) && !empty($_POST["full_tweet"])) {
-        $_POST['option'] = 'full_tweet';
-    }
+
 
     if (isset($_POST["option"]) && !empty($_POST["option"])) {
 
@@ -63,8 +77,14 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST') {
                 ) {
                     $result = User::is_email($pdo, $_POST["email"]);
                     if ($result) { // zwracam wartość tekstową, nie udaje się odczytać wartości binarnej
-                        $_SESSION["username"] = $result->getUsername();
-                        echo "yes";
+                        $passVerified = $result->isTheSamePass($_POST["haslo"]);
+                        if ($passVerified) {
+                            $_SESSION["username"] = $result->getUsername();
+                            $_SESSION["email"] = $result->getEmail();
+                            echo "yes";
+                        } else  {
+                            echo "no";
+                        }
                     } else {
                         echo "no";
                     }
@@ -74,8 +94,10 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST') {
                 break;
 
             case 'logout':
+                $_SESSION = [];
+                session_unset();
                 session_destroy();
-                header('Location: Page_login1.php');
+                header('Location: Page_login.php');
                 break;
 
             case 'create_user':
@@ -126,8 +148,8 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST') {
                 break;
 
             case 'new_tweet':
-                $tt = createNewTweet($pdo, $_POST['new_tweet']);
-                header('Location: Page_main.php');
+                $result = createNewTweet($pdo, $_POST['new_tweet']);
+                header('Location: Pages/Page_main.php');
                 break;
 
             case 'user_tweets':
@@ -167,8 +189,56 @@ if ( $_SERVER['REQUEST_METHOD'] == 'POST') {
                 echo json_encode($result);
                 break;
 
+            case 'messages':
+                $user = User::is_username($pdo, $_SESSION['username']);
+                $id = $user->getId();
+                $result = [];
+                $arr = Message::loadMessagesIfId($pdo, $id);
+
+                if (count($arr) == 0) {
+                    echo json_encode("nie ma żadnych wiadomości");
+                    break;
+                }
+                $result = [];
+                for ($i=0; $i < count($arr); $i++){
+                    $s =  '[ ' .$arr[$i]->getId() . ' ] ';
+                    if ($id == $arr[$i]->getSenderId()) {
+                        $s .= "Do " . User::loadUserById($pdo, $arr[$i]->getReceiverId() )->getUsername();
+//                        $s .= "Do " .$arr[$i]->getReceiverId();
+                    } else {
+                        $s .= "Od " . User::loadUserById($pdo, $arr[$i]->getSenderId() )->getUsername();
+                    }
+                    $s .= ' z ' . $arr[$i]->getCreationDate() . ': ';
+                    $text = $arr[$i]->getText();
+                    if (mb_strlen($text) > 30 ) {
+                        $text = substr($text,0,30) . '...';
+                    }
+                    $s .= " " . $text;
+//                    bez sensu jest oznaczanie wiadomości
+//                    jako nieprzeczytanej przez nadawcę
+                    if ($arr[$i]->getWasRead() == 0
+                        && $id == $arr[$i]->getReceiverId() ) {
+                        $s = "<b>" . $s . "</b>";
+                    }
+
+                    $result[] = $s . "<br><br>";
+                }
+                echo json_encode($result);
+                break;
+
+            case 'msg_single':
+                $mm = Message::loadMessageById($pdo, $_SESSION['msg_single']);
+
+                $result = ""
+                  .  " Nadawca: " . User::loadUserById($pdo, $mm->getSenderId() )->getUsername() . "<br>"
+                  .  " Odbiorca: " . User::loadUserById($pdo, $mm->getReceiverId() )->getUsername() . "<br>"
+                  . "Treść: " . $mm->getText() ;
+
+                echo json_encode($result);
+                break;
+
             default:
-                echo "ERROR: Not a standard option";
+                echo json_encode("ERROR: Not a standard option");
         }
     }
 }

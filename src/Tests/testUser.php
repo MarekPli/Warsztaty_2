@@ -1,8 +1,8 @@
 <?php
-include_once(__DIR__ . '/User.php');
-include_once(__DIR__ . '/DB_open.php');
-include_once(__DIR__ . '/form_test.php');
-require_once(__DIR__ . '/../vendor/autoload.php');
+include_once(__DIR__ . '/../Classes/User.php');
+include_once(__DIR__ . '/.././DB_open.php');
+include_once(__DIR__ . '/form_testUser.php');
+require_once(__DIR__ . '/../../vendor/autoload.php');
 
 $faker = \Faker\Factory::create('pl');
 

@@ -1,17 +1,22 @@
 <!DOCTYPE html>
+<form action="Page_main.php">
+    <input type="submit" name ="comeback" value="Strona główna">
+</form>
 <h1>Strona tworzenia użytkownika</h1>
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
 <form action="Page_main.php" method="post" name="page_login">
-    <label>Podaj imię i nazwisko:
+    <label>Podaj imię i nazwisko/nazwę użytkownika:
         <input type="text" id="username" name ="new_username">
     </label>
     <br>
     <label>Podaj e-mail:
         <input type="text" id="email" name ="new_email">
     </label>
+    <br>
     <label>Podaj hasło:
         <input type="text" id="password" name ="new_password">
     </label>
+    <br>
     <input type="submit" id="exit" value ="Zarejestruj się">
 </form>
 <p id="prompt"></p>
@@ -21,7 +26,7 @@ function ajaxianCreateUser(username, email, haslo) {
     var result;
     $.ajax({
         type: "POST",
-        url: "test1.php",
+        url: "../json_commands.php",
         dataType: "html", // oczekuje tekstu, wartość logiczna się źle przekazuje
         async: false, // ----------- !!!
         data: {
@@ -51,7 +56,7 @@ $(function() {
                 $('#prompt').text("Podaj wszystkie dane");
             // alert("Podaj wszystkie dane");
         } else  {
-            alert('jestem: ' + email + ' ' + username + ' ' + haslo);
+            // alert('jestem: ' + email + ' ' + username + ' ' + haslo);
             var answer = ajaxianCreateUser(username,email, haslo);
             switch(answer) {
                 case "duplicated mail":
@@ -72,3 +77,14 @@ $(function() {
 </script>
 
 </html>
+<?php
+$newTweet = 0;
+if ( $_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['new_tweet'])
+        && !empty($_POST['new_tweet'])
+    ) {
+        $newTweet = 1;
+    }
+}
+
+?>

@@ -1,6 +1,6 @@
 <table>
     <td>
-        <form action="form_test.php" method="post" name="user">
+        <form action="form_testUser.php" method="post" name="user">
             <input type="submit" name ="add_user" value="Testuj użytkowników">
         </form>
 
@@ -18,8 +18,11 @@
         </form>
     </td>
     <td>
-        <form action=".././indeks.php" method="post" name="return">
-            <input type="submit" name ="add_user" value="Powrót">
+        <form action="../../indeks.php" method="post" name="return">
+            <input type="submit" name ="add_user" value="Strona główna">
+        </form>
+        <form action="../Pages/Page_login.php" method="post" name="return">
+            <input type="submit" name ="add_user" value="Tweeter">
         </form>
     </td>
 </table>
